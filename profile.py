@@ -154,38 +154,22 @@ portal.context.defineParameter("x310_pair_nodetype",
                                portal.ParameterType.STRING, "d740")
 
 rooftop_names = [
-    ("cbrssdr1-bes",
-     "Behavioral: cbrssdr"),
-    ("cbrssdr1-browning",
-     "Browning: cbrssdr"),
-    ("cbrssdr1-dentistry",
-     "Dentistry: cbrssdr"),
-    ("cbrssdr1-fm",
-     "Friendship Manor: cbrssdr"),
-    ("cbrssdr1-honors",
-     "Honors: cbrssdr"),
-    ("cbrssdr1-meb",
-     "MEB: cbrssdr"),
-    ("cbrssdr1-smt",
-     "SMT: cbrssdr"),
-    ("cbrssdr1-ustar",
-     "USTAR: cbrssdr"),
     ("cellsdr1-bes",
-     "Behavioral: cellsdr"),
+     "Behavioral: cellsdr1-bes"),
     ("cellsdr1-browning",
-     "Browning: cellsdr"),
+     "Browning: cellsdr1-browning"),
     ("cellsdr1-dentistry",
-     "Dentistry: cellsdr"),
+     "Dentistry: cellsdr1-dentistry"),
     ("cellsdr1-fm",
-     "Friendship Manor: cellsdr"),
+     "Friendship Manor: cellsdrsdr1-fm"),
     ("cellsdr1-honors",
-     "Honors: cellsdr"),
+     "Honors: cellsdrs1-honors"),
     ("cellsdr1-meb",
-     "MEB: cellsdr"),
+     "MEB: cellsdr1-meb"),
     ("cellsdr1-smt",
-     "SMT: cellsdr"),
+     "SMT: cellsdrsdr1-smt"),
     ("cellsdr1-ustar",
-     "USTAR: cellsdr")
+     "USTAR: cellsdr1-ustar")
 ]
 
 portal.context.defineStructParameter("x310_radios", "X310 Radios", [],
@@ -206,21 +190,21 @@ portal.context.defineStructParameter("x310_radios", "X310 Radios", [],
 
 fixed_endpoint_aggregates = [
     ("web",
-     "Warnock Engineering Building"),
+     "WEB"),
     ("ebc",
-     "Eccles Broadcast Center"),
+     "EBC"),
     ("bookstore",
      "Bookstore"),
     ("humanities",
      "Humanities"),
     ("law73",
-     "Law (building 73)"),
+     "Law 73"),
     ("madsen",
-     "Madsen Clinic"),
+     "Madsen"),
     ("sagepoint",
      "Sage Point"),
     ("moran",
-     "Moran Eye Center"),
+     "Moran"),
 ]
 
 portal.context.defineStructParameter("b210_nodes", "B210 Radios", [],
@@ -241,6 +225,22 @@ portal.context.defineStructParameter("b210_nodes", "B210 Radios", [],
                                              fixed_endpoint_aggregates)
                                      ],
                                     )
+
+channel_bandwidth_strings = [
+    ('1.4', '1.4 MHz'),
+    ('3', '3 MHz'),
+    ('5', '5 MHz'),
+    ('10', '10 MHz'),
+]
+
+portal.context.defineParameter(
+    "channel_bandwidth",
+    "Channel Bandwidth",
+    portal.ParameterType.STRING, 
+    channel_bandwidth_strings[0],
+    channel_bandwidth_strings,
+    "Channel bandwidth for LTE",
+)
 
 portal.context.defineParameter("install_srslte",
                                "Should srsLTE Radio be installed?",
