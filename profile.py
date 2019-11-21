@@ -106,11 +106,16 @@ import geni.rspec.igext as ig
 import geni.rspec.emulab.spectrum as spectrum
 
 x310_node_disk_image = \
-        "urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD"
+		"urn:publicid:IDN+emulab.net+image+PowderProfiles:U18-GR-SRS-x310"
+#        "urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD"
 b210_node_disk_image = \
-        "urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD"
+		"urn:publicid:IDN+emulab.net+image+PowderProfiles:U18-GR-SRS-b210"
+#		"urn:publicid:IDN+emulab.net+image+cs6480-2016:UBUNTU18-GR-SRSLTE"
+#        "urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD"
 
-setup_command = "/local/repository/startup.sh"
+
+
+#setup_command = "/local/repository/startup.sh"
 
 
 def x310_node_pair(idx, x310_radio, node_type, installs):
@@ -122,8 +127,8 @@ def x310_node_pair(idx, x310_radio, node_type, installs):
     node.disk_image = x310_node_disk_image
     node.component_manager_id = "urn:publicid:IDN+emulab.net+authority+cm"
 
-    service_command = " ".join([setup_command] + installs)
-    node.addService(rspec.Execute(shell="bash", command=service_command))
+#    service_command = " ".join([setup_command] + installs)
+#    node.addService(rspec.Execute(shell="bash", command=service_command))
 
     node_radio_if = node.addInterface("usrp_if")
     node_radio_if.addAddress(rspec.IPv4Address("192.168.40.1",
@@ -139,36 +144,9 @@ def b210_nuc_pair(idx, b210_node, installs):
     b210_nuc_pair_node = request.RawPC("b210-%s-%s"%(b210_node.aggregate_id,b210_node.component_id))
     agg_full_name = "urn:publicid:IDN+%s.powderwireless.net+authority+cm"%(b210_node.aggregate_id)
     b210_nuc_pair_node.component_manager_id = agg_full_name
-    b210_nuc_pair_node.component_id = b210_node.component_id
-
+    b210_nuc_pair_node.component_id = "nuc2"
     b210_nuc_pair_node.disk_image = b210_node_disk_image
 
-    service_command = " ".join([setup_command] + installs)
-    b210_nuc_pair_node.addService(
-        rspec.Execute(shell="bash", command=service_command))
-
-channel_bandwidth_strings = [
-    ('1.4', '1.4 MHz'),
-    ('3', '3 MHz'),
-    ('5', '5 MHz'),
-    ('10', '10 MHz'),
-]
-
-# n PRB, width of frequency to allocate, ul_amp, dl_gain
-channel_bandwidths = {
-    '1.4': (6, 1.4, 0.5, 0.20),
-    '3': (15, 3, 0.5, 0.20),
-    '5': (25, 5, 0.5, 0.20),
-    '10': (50, 10, 0.5, 0.20),
-}
-
-portal.context.defineParameter(
-    "channel_bandwidth",
-    "LTE Channel Bandwidth",
-    portal.ParameterType.STRING, 
-    channel_bandwidth_strings[2],
-    channel_bandwidth_strings
-)
 
 portal.context.defineParameter("x310_pair_nodetype",
                                "Type of compute node paired with the X310 Radios",
@@ -211,33 +189,33 @@ portal.context.defineStructParameter("x310_radios", "X310 Radios", [],
 
 fixed_endpoint_aggregates = [
     ("web",
-     "WEB"),
+     "WEB: nuc2"),
     ("ebc",
-     "EBC"),
+     "EBC: nuc2"),
     ("bookstore",
-     "Bookstore"),
+     "Bookstore: nuc2"),
     ("humanities",
-     "Humanities"),
+     "Humanities: nuc2"),
     ("law73",
-     "Law 73"),
+     "Law 73: nuc2"),
     ("madsen",
-     "Madsen"),
+     "Madsen: nuc2"),
     ("sagepoint",
-     "Sage Point"),
+     "Sage Point: nuc2"),
     ("moran",
-     "Moran"),
+     "Moran: nuc2"),
 ]
 
 portal.context.defineStructParameter("b210_nodes", "B210 Radios", [],
                                      multiValue=True,
-                                     itemDefaultValue=
-                                     {"component_id": "nuc2"},
+#                                     itemDefaultValue=
+#                                     {"component_id": "nuc2"},
                                      min=0, max=None,
                                      members=[
-                                         portal.Parameter(
-                                             "component_id",
-                                             "Component ID (like nuc2)",
-                                             portal.ParameterType.STRING, ""),
+#                                         portal.Parameter(
+#                                             "component_id",
+#                                             "Component ID (like nuc2)",
+#                                             portal.ParameterType.STRING, ""),
                                          portal.Parameter(
                                              "aggregate_id",
                                              "Fixed Endpoint B210",
@@ -255,50 +233,16 @@ request = portal.context.makeRequestRSpec()
 
 installs = []
 
-installs.append("srslte")
-installs.append("gnuradio")
+#installs.append("srslte")
+#installs.append("gnuradio")
 
-# fix the downlink frequency 
-
-downlink_frequency = 2685.0
-
-# calculate srsLTE configuration parameters
-
-downlink_earfcn = downlink_frequency
-
-centi_khz = downlink_frequency * 10
-centi_khz = int(round(centi_khz))
-
-if centi_khz < 26200:
-	raise Exception("Too low of a downlink frequency for band 7")
-if centi_khz > 26899:
-	raise Exception("Too high of a downlink frequency for band 7")
-
-earfcn = centi_khz - 26200 + 2750
-
-channel_bandwidth_str = params.channel_bandwidth
-n_prb, bandwidth, ul_amp, dl_gain = channel_bandwidths[channel_bandwidth_str]
-
-low_downlink_frequency = downlink_frequency - bandwidth/2
-high_downlink_frequency = downlink_frequency + bandwidth/2
-low_uplink_frequency = downlink_frequency - bandwidth/2 - 120
-high_uplink_frequency = downlink_frequency + bandwidth/2 - 120
-
-request.requestSpectrum(low_downlink_frequency, high_downlink_frequency,0)
-request.requestSpectrum(low_uplink_frequency, high_uplink_frequency, 0)
-
-channel_setup_format_string = ("channel_setup-{n_prb}-{earfcn}-{ul_amp}-"
-                                    "{dl_gain}")
-installs.append(channel_setup_format_string.format(n_prb=n_prb,
-                                                    earfcn=earfcn,
-                                                    ul_amp=ul_amp,
-                                                    dl_gain=dl_gain))
+request.requestSpectrum(2560, 2570,0)
+request.requestSpectrum(2680, 2690, 0)
 
 for i, x310_radio in enumerate(params.x310_radios):
     x310_node_pair(i, x310_radio, params.x310_pair_nodetype, installs)
 
 for i, b210_node in enumerate(params.b210_nodes):
     b210_nuc_pair(i, b210_node, installs)
-
 
 portal.context.printRequestRSpec()
