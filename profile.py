@@ -33,16 +33,16 @@ Resources needed to realize a basic srsLTE setup consisting of a UE, an eNodeB a
   
 **Specific resources that can be used (and that need to be reserved before instantiating the profile):** 
 
-  * Frequencies:
-   * Uplink frequency: 2560 MHz to 2570 MHz
-   * Downlink frequency: 2680 MHz to 2690 MHz
-
   * Hardware (at least one set of resources are needed):
    * Humanities, nuc2; Emulab, cellsdr1-browning; Emulab, d740
    * Bookstore, nuc2; Emulab, cellsdr1-bes; Emulab, d740
    * Moran Eye Center, nuc2; Emulab, cellsdr1-ustar; Emulab, d740 
 
-The instuctions below assume the first configuration.
+  * Frequencies:
+   * Uplink frequency: 2560 MHz to 2570 MHz
+   * Downlink frequency: 2680 MHz to 2690 MHz
+
+The instuctions below assume the first hardware configuration.
 
 Instructions:
 
@@ -50,7 +50,7 @@ Instructions:
 
 **To run the EPC**
 
-Open a terminal on the `cellsdr1-ustar-comp` node in your experiment. (Go to the "List View"
+Open a terminal on the `cellsdr1-browning-comp` node in your experiment. (Go to the "List View"
 in your experiment. If you have ssh keys and an ssh client working in your
 setup you should be able to click on the black "ssh -p ..." command to get a
 terminal. If ssh is not working in your setup, you can open a browser shell
@@ -63,7 +63,7 @@ Start up the EPC:
     
 **To run the eNodeB**
 
-Open another terminal on the `cellsdr1-ustar-comp` node in your experiment.
+Open another terminal on the `cellsdr1-browning-comp` node in your experiment.
 
 Start up the eNodeB:
 
@@ -71,7 +71,7 @@ Start up the eNodeB:
 
 **To run the UE**
 
-Open a terminal on the `b210-moran-nuc2` node in your experiment.
+Open a terminal on the `b210-humanties-nuc2` node in your experiment.
 
 Start up the UE:
 
@@ -79,7 +79,7 @@ Start up the UE:
 
 **Verify functionality**
 
-Open another terminal on the `b210-moran-nuc2` node in your experiment.
+Open another terminal on the `b210-humanities-nuc2` node in your experiment.
 
 Verify that the virtual network interface tun_srsue" has been created:
 
@@ -106,15 +106,8 @@ import geni.rspec.emulab.spectrum as spectrum
 
 x310_node_disk_image = \
 		"urn:publicid:IDN+emulab.net+image+PowderProfiles:U18-GR-SRS-x310"
-#        "urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD"
 b210_node_disk_image = \
 		"urn:publicid:IDN+emulab.net+image+PowderProfiles:U18-GR-SRS-b210"
-#		"urn:publicid:IDN+emulab.net+image+cs6480-2016:UBUNTU18-GR-SRSLTE"
-#        "urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD"
-
-
-
-#setup_command = "/local/repository/startup.sh"
 
 
 def x310_node_pair(idx, x310_radio, node_type, installs):
@@ -125,9 +118,6 @@ def x310_node_pair(idx, x310_radio, node_type, installs):
     node.hardware_type = node_type
     node.disk_image = x310_node_disk_image
     node.component_manager_id = "urn:publicid:IDN+emulab.net+authority+cm"
-
-#    service_command = " ".join([setup_command] + installs)
-#    node.addService(rspec.Execute(shell="bash", command=service_command))
 
     node_radio_if = node.addInterface("usrp_if")
     node_radio_if.addAddress(rspec.IPv4Address("192.168.40.1",
@@ -216,14 +206,8 @@ fixed_endpoint_aggregates = [
 
 portal.context.defineStructParameter("b210_nodes", "B210 Radios", [],
                                      multiValue=True,
-#                                     itemDefaultValue=
-#                                     {"component_id": "nuc2"},
                                      min=0, max=None,
                                      members=[
-#                                         portal.Parameter(
-#                                             "component_id",
-#                                             "Component ID (like nuc2)",
-#                                             portal.ParameterType.STRING, ""),
                                          portal.Parameter(
                                              "aggregate_id",
                                              "Fixed Endpoint B210",
@@ -240,9 +224,6 @@ params = portal.context.bindParameters()
 request = portal.context.makeRequestRSpec()
 
 installs = []
-
-#installs.append("srslte")
-#installs.append("gnuradio")
 
 request.requestSpectrum(2560, 2570,0)
 request.requestSpectrum(2680, 2690, 0)
