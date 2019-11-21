@@ -21,27 +21,26 @@ an Intel NUC small form factor compute node. Both B210s are connected
 to broadband antennas: nuc1 is connected in an RX only configuration,
 while nuc2 is connected in a TX/RX configuration.
 
-By default the profile will install srsLTE software, as well as
-GNU Radio and the UHD software tools.
+The profile uses a disk image with srsLTE software, as well as
+GNU Radio and the UHD software tools, pre-installed.
 
 Resources needed to realize a basic srsLTE setup consisting of a UE, an eNodeB and an EPC core network:
 
   * Frequency ranges (uplink and downlink) for LTE FDD operation. 
   * A "nuc2" fixed-end point compute/SDR pair. (This will run the UE side.)
-  * A "cellsdr" SDR base station. (This will be the radio side of the eNodeB.)
+  * A "cellsdr" base station SDR. (This will be the radio side of the eNodeB.)
   * A "d740" compute node. (This will run both the eNodeB software and the EPC software.)
   
-**Specific resources that can be used:** 
+**Specific resources that can be used (and that need to be reserved before instantiating the profile):** 
 
   * Frequencies:
    * Uplink frequency: 2560 MHz to 2570 MHz
    * Downlink frequency: 2680 MHz to 2690 MHz
 
   * Hardware (at least one set of resources are needed):
-   * Moran Eye Center, nuc2; Emulab, cellsdr1-ustar; Emulab, d740 
-   * Humanities, nuc2; Emulab, cellsdr1-smt; Emulab, d740
-   * Building 73, nuc2; Emulab, cellsdr1-browning; Emulab, d740
+   * Humanities, nuc2; Emulab, cellsdr1-browning; Emulab, d740
    * Bookstore, nuc2; Emulab, cellsdr1-bes; Emulab, d740
+   * Moran Eye Center, nuc2; Emulab, cellsdr1-ustar; Emulab, d740 
 
 The instuctions below assume the first configuration.
 
@@ -148,27 +147,36 @@ def b210_nuc_pair(idx, b210_node, installs):
     b210_nuc_pair_node.disk_image = b210_node_disk_image
 
 
+node_type = [
+    ("d740",
+	"Emulab, d740"),
+     ("d430",
+	"Emulab, d430")
+]
+	
 portal.context.defineParameter("x310_pair_nodetype",
                                "Type of compute node paired with the X310 Radios",
-                               portal.ParameterType.STRING, "d740")
+                               portal.ParameterType.STRING,
+                               node_type[0],
+                               node_type)
 
 rooftop_names = [
     ("cellsdr1-bes",
-     "Behavioral: cellsdr1-bes"),
+     "Emulab, cellsdr1-bes (Behavioral)"),
     ("cellsdr1-browning",
-     "Browning: cellsdr1-browning"),
+     "Emulab, cellsdr1-browning (Browning)"),
     ("cellsdr1-dentistry",
-     "Dentistry: cellsdr1-dentistry"),
+     "Emulab, cellsdr1-dentistry (Dentistry)"),
     ("cellsdr1-fm",
-     "Friendship Manor: cellsdrsdr1-fm"),
+     "Emulab, cellsdrsdr1-fm (Friendship Manor)"),
     ("cellsdr1-honors",
-     "Honors: cellsdrs1-honors"),
+     "Emulab, cellsdrs1-honors (Honors)"),
     ("cellsdr1-meb",
-     "MEB: cellsdr1-meb"),
+     "Emulab, cellsdr1-meb (MEB)"),
     ("cellsdr1-smt",
-     "SMT: cellsdrsdr1-smt"),
+     "Emulab, cellsdrsdr1-smt (SMT)"),
     ("cellsdr1-ustar",
-     "USTAR: cellsdr1-ustar")
+     "Emulab, cellsdr1-ustar (USTAR)")
 ]
 
 portal.context.defineStructParameter("x310_radios", "X310 Radios", [],
@@ -189,21 +197,21 @@ portal.context.defineStructParameter("x310_radios", "X310 Radios", [],
 
 fixed_endpoint_aggregates = [
     ("web",
-     "WEB: nuc2"),
+     "WEB, nuc2"),
     ("ebc",
-     "EBC: nuc2"),
+     "EBC, nuc2"),
     ("bookstore",
-     "Bookstore: nuc2"),
+     "Bookstore, nuc2"),
     ("humanities",
-     "Humanities: nuc2"),
+     "Humanities, nuc2"),
     ("law73",
-     "Law 73: nuc2"),
+     "Law 73, nuc2"),
     ("madsen",
-     "Madsen: nuc2"),
+     "Madsen, nuc2"),
     ("sagepoint",
-     "Sage Point: nuc2"),
+     "Sage Point, nuc2"),
     ("moran",
-     "Moran: nuc2"),
+     "Moran, nuc2"),
 ]
 
 portal.context.defineStructParameter("b210_nodes", "B210 Radios", [],
