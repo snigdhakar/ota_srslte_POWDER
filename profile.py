@@ -141,7 +141,7 @@ def x310_node_pair(idx, x310_radio, node_type, installs):
 
 
 def b210_nuc_pair(idx, b210_node, installs):
-    b210_nuc_pair_node = request.RawPC("b210-%s-%s"%(b210_node.aggregate_id,b210_node.component_id))
+    b210_nuc_pair_node = request.RawPC("b210-%s-%s"%(b210_node.aggregate_id,"nuc2"))
     agg_full_name = "urn:publicid:IDN+%s.powderwireless.net+authority+cm"%(b210_node.aggregate_id)
     b210_nuc_pair_node.component_manager_id = agg_full_name
     b210_nuc_pair_node.component_id = "nuc2"
