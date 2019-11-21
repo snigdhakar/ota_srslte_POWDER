@@ -233,36 +233,72 @@ channel_bandwidth_strings = [
     ('10', '10 MHz'),
 ]
 
+# n PRB, width of frequency to allocate
+channel_bandwidths = {
+    '1.4': (6, 1.4, 0.5, 0.20),
+    '3': (15, 3, 0.5, 0.20),
+    '5': (25, 5, 0.5, 0.20),
+    '10': (50, 10, 0.5, 0.20),
+    '15': (75, 15, 0.5, 0.20),
+    '20': (100, 20, 0.5, 0.20),
+}
+
 portal.context.defineParameter(
     "channel_bandwidth",
-    "Channel Bandwidth",
+    "LTE Channel Bandwidth",
     portal.ParameterType.STRING, 
-    channel_bandwidth_strings[0],
-    channel_bandwidth_strings,
-    "Channel bandwidth for LTE",
+    channel_bandwidth_strings[2],
+    channel_bandwidth_strings
 )
 
-portal.context.defineParameter("install_srslte",
-                               "Should srsLTE Radio be installed?",
-                               portal.ParameterType.BOOLEAN, True)
-portal.context.defineParameter("install_gnuradio",
-                               "Should GNU Radio (where uhd_fft, uhd_siggen, "
-                               "etc come from be installed?",
-                               portal.ParameterType.BOOLEAN, True)
 
 params = portal.context.bindParameters()
 
 request = portal.context.makeRequestRSpec()
 
-request.requestSpectrum(2560, 2570, 0)
-request.requestSpectrum(2680, 2690, 0)
+
 
 installs = []
-if params.install_srslte:
-    installs.append("srslte")
 
-if params.install_gnuradio:
-    installs.append("gnuradio")
+installs.append("srslte")
+installs.append("gnuradio")
+
+
+# fix the downlink frequency 
+
+downlink_frequency = 2685.0
+
+# calculate srsLTE configuration parameters
+
+downlink_earfcn = downlink_frequency
+
+centi_khz = downlink_frequency * 10
+centi_khz = int(round(centi_khz))
+
+if centi_khz < 26200:
+	raise Exception("Too low of a downlink frequency for band 7")
+if centi_khz > 26899:
+	raise Exception("Too high of a downlink frequency for band 7")
+
+earfcn = centi_khz - 26200 + 2750
+
+channel_bandwidth_str = params.channel_bandwidth
+n_prb, bandwidth, ul_amp, dl_gain = channel_bandwidths[channel_bandwidth_str]
+
+low_downlink_frequency = downlink_frequency - bandwidth/2
+high_downlink_frequency = downlink_frequency + bandwidth/2
+low_uplink_frequency = downlink_frequency - bandwidth/2 - 120
+high_uplink_frequency = downlink_frequency + bandwidth/2 - 120
+
+request.requestSpectrum(low_downlink_frequency, high_downlink_frequency,0)
+request.requestSpectrum(low_uplink_frequency, high_uplink_frequency, 0)
+
+channel_setup_format_string = ("channel_setup-{n_prb}-{earfcn}-{ul_amp}-"
+                                    "{dl_gain}")
+installs.append(channel_setup_format_string.format(n_prb=n_prb,
+                                                    earfcn=earfcn,
+                                                    ul_amp=ul_amp,
+                                                    dl_gain=dl_gain))
 
 for i, x310_radio in enumerate(params.x310_radios):
     x310_node_pair(i, x310_radio, params.x310_pair_nodetype, installs)
