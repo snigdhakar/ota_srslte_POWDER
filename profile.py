@@ -147,7 +147,28 @@ def b210_nuc_pair(idx, b210_node, installs):
     b210_nuc_pair_node.addService(
         rspec.Execute(shell="bash", command=service_command))
 
+channel_bandwidth_strings = [
+    ('1.4', '1.4 MHz'),
+    ('3', '3 MHz'),
+    ('5', '5 MHz'),
+    ('10', '10 MHz'),
+]
 
+# n PRB, width of frequency to allocate, ul_amp, dl_gain
+channel_bandwidths = {
+    '1.4': (6, 1.4, 0.5, 0.20),
+    '3': (15, 3, 0.5, 0.20),
+    '5': (25, 5, 0.5, 0.20),
+    '10': (50, 10, 0.5, 0.20),
+}
+
+portal.context.defineParameter(
+    "channel_bandwidth",
+    "LTE Channel Bandwidth",
+    portal.ParameterType.STRING, 
+    channel_bandwidth_strings[2],
+    channel_bandwidth_strings
+)
 
 portal.context.defineParameter("x310_pair_nodetype",
                                "Type of compute node paired with the X310 Radios",
@@ -226,43 +247,16 @@ portal.context.defineStructParameter("b210_nodes", "B210 Radios", [],
                                      ],
                                     )
 
-channel_bandwidth_strings = [
-    ('1.4', '1.4 MHz'),
-    ('3', '3 MHz'),
-    ('5', '5 MHz'),
-    ('10', '10 MHz'),
-]
-
-# n PRB, width of frequency to allocate
-channel_bandwidths = {
-    '1.4': (6, 1.4, 0.5, 0.20),
-    '3': (15, 3, 0.5, 0.20),
-    '5': (25, 5, 0.5, 0.20),
-    '10': (50, 10, 0.5, 0.20),
-    '15': (75, 15, 0.5, 0.20),
-    '20': (100, 20, 0.5, 0.20),
-}
-
-portal.context.defineParameter(
-    "channel_bandwidth",
-    "LTE Channel Bandwidth",
-    portal.ParameterType.STRING, 
-    channel_bandwidth_strings[2],
-    channel_bandwidth_strings
-)
 
 
 params = portal.context.bindParameters()
 
 request = portal.context.makeRequestRSpec()
 
-
-
 installs = []
 
 installs.append("srslte")
 installs.append("gnuradio")
-
 
 # fix the downlink frequency 
 
