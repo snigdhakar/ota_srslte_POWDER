@@ -36,7 +36,7 @@ Resources needed to realize a basic srsLTE setup consisting of a UE, an eNodeB a
   * Hardware (at least one set of resources are needed):
    * Humanities, nuc2; Emulab, cellsdr1-browning; Emulab, d740
    * Bookstore, nuc2; Emulab, cellsdr1-bes; Emulab, d740
-   * Moran Eye Center, nuc2; Emulab, cellsdr1-ustar; Emulab, d740 
+   * Moran, nuc2; Emulab, cellsdr1-ustar; Emulab, d740 
 
   * Frequencies:
    * Uplink frequency: 2560 MHz to 2570 MHz
