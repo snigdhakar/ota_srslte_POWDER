@@ -37,7 +37,8 @@ Resources needed to realize a basic srsLTE setup consisting of a UE, an eNodeB a
    * Humanities, nuc2; Emulab, cellsdr1-browning; Emulab, d740
    * Bookstore, nuc2; Emulab, cellsdr1-bes; Emulab, d740
    * Moran, nuc2; Emulab, cellsdr1-ustar; Emulab, d740 
-
+<br>
+<br>
   * Frequencies:
    * Uplink frequency: 2560 MHz to 2570 MHz
    * Downlink frequency: 2680 MHz to 2690 MHz
@@ -46,7 +47,7 @@ The instuctions below assume the first hardware configuration.
 
 Instructions:
 
-The instructions below assume the following hardware:
+The instructions below assume the following hardware set was selected when the profile was instantiated:
 
  * Humanities, nuc2; Emulab, cellsdr1-browning; Emulab, d740
 
