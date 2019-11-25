@@ -46,6 +46,10 @@ The instuctions below assume the first hardware configuration.
 
 Instructions:
 
+The instructions below assume the following hardware:
+
+ * Humanities, nuc2; Emulab, cellsdr1-browning; Emulab, d740
+
 #### To run the srsLTE software
 
 **To run the EPC**
