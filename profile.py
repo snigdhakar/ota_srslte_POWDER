@@ -47,7 +47,7 @@ Instructions:
 
 The instructions below assume the following hardware set was selected when the profile was instantiated:
 
- * Humanities, nuc2; Emulab, cellsdr1-browning; Emulab, d740
+ * Bookstore, nuc2; Emulab, cellsdr1-browning; Emulab, d740
 
 #### To run the srsLTE software
 
@@ -74,7 +74,7 @@ Start up the eNodeB:
 
 **To run the UE**
 
-Open a terminal on the `b210-humanties-nuc2` node in your experiment.
+Open a terminal on the `b210-bookstore-nuc2` node in your experiment.
 
 Start up the UE:
 
@@ -82,7 +82,7 @@ Start up the UE:
 
 **Verify functionality**
 
-Open another terminal on the `b210-humanities-nuc2` node in your experiment.
+Open another terminal on the `b210-bookstore-nuc2` node in your experiment.
 
 Verify that the virtual network interface tun_srsue" has been created:
 
