@@ -228,8 +228,8 @@ request = portal.context.makeRequestRSpec()
 
 installs = []
 
-request.requestSpectrum(2560, 2570,0)
-request.requestSpectrum(2680, 2690, 0)
+request.requestSpectrum(2560.01, 2570, 0)
+request.requestSpectrum(2680.01, 2690, 0)
 
 for i, x310_radio in enumerate(params.x310_radios):
     x310_node_pair(i, x310_radio, params.x310_pair_nodetype, installs)
