@@ -38,8 +38,8 @@ Resources needed to realize a basic srsLTE setup consisting of a UE, an eNodeB a
    * Bookstore, nuc2; Emulab, cellsdr1-bes; Emulab, d740
    * Moran, nuc2; Emulab, cellsdr1-ustar; Emulab, d740 
   * Frequencies:
-   * Uplink frequency: 2560 MHz to 2570 MHz
-   * Downlink frequency: 2680 MHz to 2690 MHz
+   * Uplink frequency: 2500 MHz to 2510 MHz
+   * Downlink frequency: 2620 MHz to 2630 MHz
 
 The instuctions below assume the first hardware configuration.
 
@@ -125,6 +125,9 @@ def x310_node_pair(idx, x310_radio):
     node.hardware_type = params.x310_pair_nodetype
     node.disk_image = GLOBALS.SRSLTE_IMG
     node.component_manager_id = "urn:publicid:IDN+emulab.net+authority+cm"
+    node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/add-nat-and-ip-forwarding.sh"))
+    node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/update-config-files.sh"))
+    node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/tune-cpu.sh"))
 
     if params.include_srslte_src:
         bs = node.Blockstore("bs", "/opt/srslte")
@@ -146,6 +149,8 @@ def b210_nuc_pair(idx, b210_node):
     b210_nuc_pair_node.component_manager_id = agg_full_name
     b210_nuc_pair_node.component_id = "nuc2"
     b210_nuc_pair_node.disk_image = GLOBALS.SRSLTE_IMG
+    b210_nuc_pair_node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/update-config-files.sh"))
+    b210_nuc_pair_node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/tune-cpu.sh"))
 
     if params.include_srslte_src:
         bs = b210_nuc_pair_node.Blockstore("bs", "/opt/srslte")
@@ -238,8 +243,8 @@ portal.context.defineStructParameter("b210_nodes", "B210 Radios", [],
 
 params = portal.context.bindParameters()
 request = portal.context.makeRequestRSpec()
-request.requestSpectrum(2500, 2510, 0)
-request.requestSpectrum(2620, 2630, 0)
+# request.requestSpectrum(GLOBALS.ULLOFREQ, GLOBALS.ULHIFREQ, 0)
+request.requestSpectrum(GLOBALS.DLLOFREQ, GLOBALS.DLHIFREQ, 0)
 
 for i, x310_radio in enumerate(params.x310_radios):
     x310_node_pair(i, x310_radio)
