@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
-"""
-This profile allows the allocation of resources for over-the-air
+"""This profile allows the allocation of resources for over-the-air
 operation on the POWDER platform. Specifically, the profile has
 options to request the allocation of SDR radios in rooftop 
 base-stations and fixed-endpoints (i.e., nodes deployed at
@@ -38,8 +37,8 @@ Resources needed to realize a basic srsLTE setup consisting of a UE, an eNodeB a
    * Bookstore, nuc2; Emulab, cellsdr1-bes; Emulab, d740
    * Moran, nuc2; Emulab, cellsdr1-ustar; Emulab, d740 
   * Frequencies:
-   * Uplink frequency: 2560 MHz to 2570 MHz
-   * Downlink frequency: 2680 MHz to 2690 MHz
+   * Uplink frequency: 2500 MHz to 2510 MHz
+   * Downlink frequency: 2620 MHz to 2630 MHz
 
 The instuctions below assume the first hardware configuration.
 
@@ -47,7 +46,7 @@ Instructions:
 
 The instructions below assume the following hardware set was selected when the profile was instantiated:
 
- * Humanities, nuc2; Emulab, cellsdr1-browning; Emulab, d740
+ * Bookstore, nuc2; Emulab, cellsdr1-browning; Emulab, d740
 
 #### To run the srsLTE software
 
@@ -74,7 +73,7 @@ Start up the eNodeB:
 
 **To run the UE**
 
-Open a terminal on the `b210-humanties-nuc2` node in your experiment.
+Open a terminal on the `b210-bookstore-nuc2` node in your experiment.
 
 Start up the UE:
 
@@ -82,7 +81,7 @@ Start up the UE:
 
 **Verify functionality**
 
-Open another terminal on the `b210-humanities-nuc2` node in your experiment.
+Open another terminal on the `b210-bookstore-nuc2` node in your experiment.
 
 Verify that the virtual network interface tun_srsue" has been created:
 
@@ -99,6 +98,14 @@ enabled to see a real time view of the signals received by the UE:
 
     sudo srsue --gui.enable 1
 
+Note: If srsenb fails with an error indicating "No compatible RF-frontend
+found", you'll need to flash the appropriate firmware to the X310 and
+power-cycle it using the portal UI. Run `uhd_usrp_probe` in a shell on the
+associated compute node to get instructions for downloading and flashing the
+firmware. Use the Action buttons in the List View tab of the UI to power cycle
+the appropriate X310. If srsue fails with a similar error, try power-cycling the
+associated NUC.
+
 """
 
 import geni.portal as portal
@@ -107,20 +114,32 @@ import geni.rspec.emulab.pnext as pn
 import geni.rspec.igext as ig
 import geni.rspec.emulab.spectrum as spectrum
 
-x310_node_disk_image = \
-		"urn:publicid:IDN+emulab.net+image+PowderProfiles:U18-GR-SRS-x310"
-b210_node_disk_image = \
-		"urn:publicid:IDN+emulab.net+image+PowderProfiles:U18-GR-SRS-b210"
+
+class GLOBALS:
+    SRSLTE_IMG = "urn:publicid:IDN+emulab.net+image+PowderTeam:U18LL-SRSLTE:3"
+    SRSLTE_SRC_DS = "urn:publicid:IDN+emulab.net:powderteam+imdataset+srslte-src-v19"
+    DLHIFREQ = 2630.0
+    DLLOFREQ = 2620.0
+    ULHIFREQ = 2510.0
+    ULLOFREQ = 2500.0
 
 
-def x310_node_pair(idx, x310_radio, node_type, installs):
+def x310_node_pair(idx, x310_radio):
     radio_link = request.Link("radio-link-%d"%(idx))
     radio_link.bandwidth = 10*1000*1000
 
     node = request.RawPC("%s-comp"%(x310_radio.radio_name))
-    node.hardware_type = node_type
-    node.disk_image = x310_node_disk_image
+    node.hardware_type = params.x310_pair_nodetype
+    node.disk_image = GLOBALS.SRSLTE_IMG
     node.component_manager_id = "urn:publicid:IDN+emulab.net+authority+cm"
+    node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/add-nat-and-ip-forwarding.sh"))
+    node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/update-config-files.sh"))
+    node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/tune-cpu.sh"))
+    node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/tune-sdr-iface.sh"))
+
+    if params.include_srslte_src:
+        bs = node.Blockstore("bs", "/opt/srslte")
+        bs.dataset = GLOBALS.SRSLTE_SRC_DS
 
     node_radio_if = node.addInterface("usrp_if")
     node_radio_if.addAddress(rspec.IPv4Address("192.168.40.1",
@@ -132,21 +151,32 @@ def x310_node_pair(idx, x310_radio, node_type, installs):
     radio_link.addNode(radio)
 
 
-def b210_nuc_pair(idx, b210_node, installs):
+def b210_nuc_pair(idx, b210_node):
     b210_nuc_pair_node = request.RawPC("b210-%s-%s"%(b210_node.aggregate_id,"nuc2"))
     agg_full_name = "urn:publicid:IDN+%s.powderwireless.net+authority+cm"%(b210_node.aggregate_id)
     b210_nuc_pair_node.component_manager_id = agg_full_name
     b210_nuc_pair_node.component_id = "nuc2"
-    b210_nuc_pair_node.disk_image = b210_node_disk_image
+    b210_nuc_pair_node.disk_image = GLOBALS.SRSLTE_IMG
+    b210_nuc_pair_node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/update-config-files.sh"))
+    b210_nuc_pair_node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/tune-cpu.sh"))
 
+    if params.include_srslte_src:
+        bs = b210_nuc_pair_node.Blockstore("bs", "/opt/srslte")
+        bs.dataset = GLOBALS.SRSLTE_SRC_DS
+
+
+portal.context.defineParameter("include_srslte_src",
+                               "Include srsLTE source code.",
+                               portal.ParameterType.BOOLEAN,
+                               False)
 
 node_type = [
     ("d740",
-	"Emulab, d740"),
-     ("d430",
-	"Emulab, d430")
+     "Emulab, d740"),
+    ("d430",
+     "Emulab, d430")
 ]
-	
+
 portal.context.defineParameter("x310_pair_nodetype",
                                "Type of compute node paired with the X310 Radios",
                                portal.ParameterType.STRING,
@@ -184,9 +214,7 @@ portal.context.defineStructParameter("x310_radios", "X310 Radios", [],
                                              portal.ParameterType.STRING,
                                              rooftop_names[0],
                                              rooftop_names)
-                                             
                                      ])
-
 
 fixed_endpoint_aggregates = [
     ("web",
@@ -221,20 +249,15 @@ portal.context.defineStructParameter("b210_nodes", "B210 Radios", [],
                                     )
 
 
-
 params = portal.context.bindParameters()
-
 request = portal.context.makeRequestRSpec()
-
-installs = []
-
-request.requestSpectrum(2560, 2570,0)
-request.requestSpectrum(2680, 2690, 0)
+request.requestSpectrum(GLOBALS.ULLOFREQ, GLOBALS.ULHIFREQ, 0)
+request.requestSpectrum(GLOBALS.DLLOFREQ, GLOBALS.DLHIFREQ, 0)
 
 for i, x310_radio in enumerate(params.x310_radios):
-    x310_node_pair(i, x310_radio, params.x310_pair_nodetype, installs)
+    x310_node_pair(i, x310_radio)
 
 for i, b210_node in enumerate(params.b210_nodes):
-    b210_nuc_pair(i, b210_node, installs)
+    b210_nuc_pair(i, b210_node)
 
 portal.context.printRequestRSpec()
