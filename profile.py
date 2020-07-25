@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
-"""
-This profile allows the allocation of resources for over-the-air
+"""This profile allows the allocation of resources for over-the-air
 operation on the POWDER platform. Specifically, the profile has
 options to request the allocation of SDR radios in rooftop 
 base-stations and fixed-endpoints (i.e., nodes deployed at
@@ -99,6 +98,14 @@ enabled to see a real time view of the signals received by the UE:
 
     sudo srsue --gui.enable 1
 
+Note: If srsenb fails with an error indicating "No compatible RF-frontend
+found", you'll need to flash the appropriate firmware to the X310 and
+power-cycle it using the portal UI. Run `uhd_usrp_probe` in a shell on the
+associated compute node to get instructions for downloading and flashing the
+firmware. Use the Action buttons in the List View tab of the UI to power cycle
+the appropriate X310. If srsue fails with a similar error, try power-cycling the
+associated NUC.
+
 """
 
 import geni.portal as portal
@@ -128,6 +135,7 @@ def x310_node_pair(idx, x310_radio):
     node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/add-nat-and-ip-forwarding.sh"))
     node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/update-config-files.sh"))
     node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/tune-cpu.sh"))
+    node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/tune-sdr-iface.sh"))
 
     if params.include_srslte_src:
         bs = node.Blockstore("bs", "/opt/srslte")
@@ -243,7 +251,7 @@ portal.context.defineStructParameter("b210_nodes", "B210 Radios", [],
 
 params = portal.context.bindParameters()
 request = portal.context.makeRequestRSpec()
-# request.requestSpectrum(GLOBALS.ULLOFREQ, GLOBALS.ULHIFREQ, 0)
+request.requestSpectrum(GLOBALS.ULLOFREQ, GLOBALS.ULHIFREQ, 0)
 request.requestSpectrum(GLOBALS.DLLOFREQ, GLOBALS.DLHIFREQ, 0)
 
 for i, x310_radio in enumerate(params.x310_radios):
