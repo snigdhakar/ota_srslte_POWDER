@@ -138,7 +138,7 @@ def x310_node_pair(idx, x310_radio):
     node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/tune-sdr-iface.sh"))
 
     if params.include_srslte_src:
-        bs = node.Blockstore("bs", "/opt/srslte")
+        bs = node.Blockstore("bs-comp-%s"%idx, "/opt/srslte")
         bs.dataset = GLOBALS.SRSLTE_SRC_DS
 
     node_radio_if = node.addInterface("usrp_if")
@@ -161,7 +161,7 @@ def b210_nuc_pair(idx, b210_node):
     b210_nuc_pair_node.addService(rspec.Execute(shell="bash", command="/local/repository/bin/tune-cpu.sh"))
 
     if params.include_srslte_src:
-        bs = b210_nuc_pair_node.Blockstore("bs", "/opt/srslte")
+        bs = b210_nuc_pair_node.Blockstore("bs-nuc-%s"%idx, "/opt/srslte")
         bs.dataset = GLOBALS.SRSLTE_SRC_DS
 
 
