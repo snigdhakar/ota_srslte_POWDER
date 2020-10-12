@@ -148,6 +148,7 @@ def x310_node_pair(idx, x310_radio):
 
     radio = request.RawPC("%s-x310"%(x310_radio.radio_name))
     radio.component_id = x310_radio.radio_name
+    radio.component_manager_id = "urn:publicid:IDN+emulab.net+authority+cm"
     radio_link.addNode(radio)
 
 
