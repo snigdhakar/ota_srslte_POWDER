@@ -1,63 +1,64 @@
 #!/usr/bin/python
 
-"""This profile allows the allocation of resources for over-the-air
-operation on the POWDER platform. Specifically, the profile has
-options to request the allocation of SDR radios in rooftop 
-base-stations and fixed-endpoints (i.e., nodes deployed at
-human height).
+"""This profile allows the allocation of resources for over-the-air operation on
+the POWDER platform. Specifically, the profile has options to request the
+allocation of software defined radios (SDRs) in rooftop base-stations and
+fixed-endpoints (i.e., nodes deployed at human height).
 
 Map of deployment is here:
 https://www.powderwireless.net/map
 
-The base-station SDRs are X310s and connected to an antenna
-covering the cellular band (1695 - 2690 MHz), i.e., cellsdr,
-or to an antenna covering the CBRS band (3400 - 3800 MHz), i.e.,
-cbrssdr. Each X310 is paired with a compute node (by default
-a Dell d740).
+The base-station SDRs are X310s and connected to an antenna covering the
+cellular band (1695 - 2690 MHz), i.e., cellsdr, or to an antenna covering the
+CBRS band (3400 - 3800 MHz), i.e., cbrssdr. Each X310 is paired with a compute
+node (by default a Dell d740).
 
-The fixed-endpoint SDRs are B210s each of which is paired with 
-an Intel NUC small form factor compute node. Both B210s are connected
-to broadband antennas: nuc1 is connected in an RX only configuration,
-while nuc2 is connected in a TX/RX configuration.
+The fixed-endpoint SDRs are B210s each of which is paired with an Intel NUC
+small form factor compute node. Both B210s are connected to broadband antennas:
+nuc1 is connected in an RX only configuration, while nuc2 is connected in a
+TX/RX configuration.
 
-The profile uses a disk image with srsLTE software, as well as
-GNU Radio and the UHD software tools, pre-installed.
+This profile uses a disk image with srsLTE and UHD pre-installed, with an option
+for including the srsLTE source code.
 
-Resources needed to realize a basic srsLTE setup consisting of a UE, an eNodeB and an EPC core network:
+Resources needed to realize a basic srsLTE setup consisting of a UE, an eNodeB
+and an EPC core network:
 
-  * Frequency ranges (uplink and downlink) for LTE FDD operation. 
-  * A "nuc2" fixed-end point compute/SDR pair. (This will run the UE side.)
+  * Spectrum for LTE FDD opperation (uplink and downlink).
+  * A "nuc2" fixed-endpoint compute/SDR pair (This will run the UE side.)
   * A "cellsdr" base station SDR. (This will be the radio side of the eNodeB.)
   * A "d740" compute node. (This will run both the eNodeB software and the EPC software.)
   
-**Specific resources that can be used (and that need to be reserved before instantiating the profile):** 
+**Example resources that can be used (and that need to be reserved before
+  instantiating the profile):**
 
   * Hardware (at least one set of resources are needed):
-   * Humanities, nuc2; Emulab, cellsdr1-browning; Emulab, d740
+   * WEB, nuc2; Emulab, cellsdr1-browning; Emulab, d740
    * Bookstore, nuc2; Emulab, cellsdr1-bes; Emulab, d740
    * Moran, nuc2; Emulab, cellsdr1-ustar; Emulab, d740 
-  * Frequencies:
-   * Uplink frequency: 2500 MHz to 2510 MHz
-   * Downlink frequency: 2620 MHz to 2630 MHz
+  * Spectrum:
+   * Uplink: 2500 MHz to 2510 MHz
+   * Downlink: 2620 MHz to 2630 MHz
 
 The instuctions below assume the first hardware configuration.
 
 Instructions:
 
-The instructions below assume the following hardware set was selected when the profile was instantiated:
+These instructions assume the following hardware set was selected when the
+profile was instantiated:
 
- * Bookstore, nuc2; Emulab, cellsdr1-browning; Emulab, d740
+ * WEB, nuc2; Emulab, cellsdr1-browning; Emulab, d740
 
 #### To run the srsLTE software
 
 **To run the EPC**
 
-Open a terminal on the `cellsdr1-browning-comp` node in your experiment. (Go to the "List View"
-in your experiment. If you have ssh keys and an ssh client working in your
-setup you should be able to click on the black "ssh -p ..." command to get a
-terminal. If ssh is not working in your setup, you can open a browser shell
-by clicking on the Actions icon corresponding to the node and selecting Shell
-from the dropdown menu.)
+Open a terminal on the `cellsdr1-browning-comp` node in your experiment. (Go to
+the "List View" in your experiment. If you have ssh keys and an ssh client
+working in your setup you should be able to click on the black "ssh -p ..."
+command to get a terminal. If ssh is not working in your setup, you can open a
+browser shell by clicking on the Actions icon corresponding to the node and
+selecting Shell from the dropdown menu.)
 
 Start up the EPC:
 
@@ -73,7 +74,7 @@ Start up the eNodeB:
 
 **To run the UE**
 
-Open a terminal on the `b210-bookstore-nuc2` node in your experiment.
+Open a terminal on the `b210-web-nuc2` node in your experiment.
 
 Start up the UE:
 
@@ -81,7 +82,7 @@ Start up the UE:
 
 **Verify functionality**
 
-Open another terminal on the `b210-bookstore-nuc2` node in your experiment.
+Open another terminal on the `b210-web-nuc2` node in your experiment.
 
 Verify that the virtual network interface tun_srsue" has been created:
 
@@ -185,22 +186,24 @@ portal.context.defineParameter("x310_pair_nodetype",
                                node_type)
 
 rooftop_names = [
-    ("cellsdr1-bes",
-     "Emulab, cellsdr1-bes (Behavioral)"),
     ("cellsdr1-browning",
      "Emulab, cellsdr1-browning (Browning)"),
+    ("cellsdr1-bes",
+     "Emulab, cellsdr1-bes (Behavioral)"),
     ("cellsdr1-dentistry",
      "Emulab, cellsdr1-dentistry (Dentistry)"),
     ("cellsdr1-fm",
-     "Emulab, cellsdrsdr1-fm (Friendship Manor)"),
+     "Emulab, cellsdr1-fm (Friendship Manor)"),
     ("cellsdr1-honors",
-     "Emulab, cellsdrs1-honors (Honors)"),
+     "Emulab, cellsdr1-honors (Honors)"),
     ("cellsdr1-meb",
      "Emulab, cellsdr1-meb (MEB)"),
     ("cellsdr1-smt",
-     "Emulab, cellsdrsdr1-smt (SMT)"),
+     "Emulab, cellsdr1-smt (SMT)"),
+    ("cellsdr1-hospital",
+     "Emulab, cellsdr1-hospital (Hospital)"),
     ("cellsdr1-ustar",
-     "Emulab, cellsdr1-ustar (USTAR)")
+     "Emulab, cellsdr1-ustar (USTAR)"),
 ]
 
 portal.context.defineStructParameter("x310_radios", "X310 Radios", [],
@@ -220,20 +223,24 @@ portal.context.defineStructParameter("x310_radios", "X310 Radios", [],
 fixed_endpoint_aggregates = [
     ("web",
      "WEB, nuc2"),
-    ("ebc",
-     "EBC, nuc2"),
     ("bookstore",
      "Bookstore, nuc2"),
     ("humanities",
      "Humanities, nuc2"),
     ("law73",
      "Law 73, nuc2"),
+    ("ebc",
+     "EBC, nuc2"),
     ("madsen",
      "Madsen, nuc2"),
     ("sagepoint",
      "Sage Point, nuc2"),
     ("moran",
      "Moran, nuc2"),
+    ("cpg",
+     "Central Parking Garage, nuc2"),
+    ("guesthouse",
+     "Guest House, nuc2"),
 ]
 
 portal.context.defineStructParameter("b210_nodes", "B210 Radios", [],
