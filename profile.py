@@ -119,8 +119,8 @@ import geni.rspec.emulab.spectrum as spectrum
 class GLOBALS:
     SRSLTE_IMG = "urn:publicid:IDN+emulab.net+image+PowderTeam:U18LL-SRSLTE:4"
     SRSLTE_SRC_DS = "urn:publicid:IDN+emulab.net:powderteam+imdataset+srslte-src-v19"
-    DLHIFREQ = 2641.0
-    DLLOFREQ = 2631.0
+    DLHIFREQ = 2680.0
+    DLLOFREQ = 2670.0
     ULHIFREQ = 2521.0
     ULLOFREQ = 2511.0
 
