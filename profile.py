@@ -121,8 +121,8 @@ class GLOBALS:
     SRSLTE_SRC_DS = "urn:publicid:IDN+emulab.net:powderteam+imdataset+srslte-src-v19"
     DLHIFREQ = 2630.0
     DLLOFREQ = 2620.0
-    ULHIFREQ = 2500.0
-    ULLOFREQ = 2510.0
+    ULHIFREQ = 2510.0
+    ULLOFREQ = 2500.0
 
 
 def x310_node_pair(idx, x310_radio):
